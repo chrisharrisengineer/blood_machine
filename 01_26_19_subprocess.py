@@ -1,7 +1,7 @@
 #!/user/bin/env python
 '''
 	File name: .py
-	Author: Harrison Huang and Cheyann Wetteland
+	Author: Chris Harris and Harrison Huang
 	Date created: 07/13/18
 	Date last modified: 10/03/18
 	Python Version: 2.7
