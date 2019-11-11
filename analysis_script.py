@@ -74,18 +74,19 @@ for filename in natsorted(os.listdir(path/picture_path)):
 	plt.pause(.001)	
 
 	#take last 5 clot probabilities in this array, add them up, divide by 5, if equal over .8, call a clot
-	last_five_array = full_clot_probability_array[-5:]
-	sum_last_five = sum(last_five_array)
-	last_five_avg = sum_last_five/5 
-	last_five_avg = float(last_five_avg)
-	print("avg is" + str(last_five_avg))
+	#unnecessary for now
+	#last_five_array = full_clot_probability_array[-5:]
+	#sum_last_five = sum(last_five_array)
+	#last_five_avg = sum_last_five/5 
+	#last_five_avg = float(last_five_avg)
+	#print("avg is" + str(last_five_avg))
 
 	
 
-	if last_five_avg > .8:
-	    print("the blood has clotted")		
-	else:
-	    print("the blood has not clotted")	
+	#if last_five_avg > .8:
+	#    print("the blood has clotted")		
+	#else:
+	#    print("the blood has not clotted")	
 	
 
 	#return pred_class1, pred_class2
