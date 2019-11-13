@@ -14,7 +14,7 @@
 		export image
 '''
 
-#TODO switch the bit to flip the "programming running" bit off
+#TODO switch the bit to flip the "programming running" bit off, added subprocesses for parallel clotting and platelet analysis
 
 import sys
 import cv2
