@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow.contrib.tensorrt as trt
 from tensorflow.python.platform import gfile
 
-path_to_model=
+path_to_model="/home/predator/Desktop/models/research/object_detection/inference_graph/model.ckpt.meta"
 
 # has to be use this setting to make a session for TensorRT optimization
 with tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(per_process_gpu_memory_fraction=0.50))) as sess:
