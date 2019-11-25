@@ -1,0 +1,60 @@
+setting up a new machine
+
+
+
+install ubuntu 16.04
+   get bootable ubunutu 16.04 usb
+   plug in to device
+   boot to bios
+   boot from usb
+   do install
+   
+install nvidia-drivers
+
+transfer all GUI and analysis files: copy "llu folder" onto machine from a storage disk where you saved them
+
+
+main program
+
+called 01_26_19_subprocess
+in /home/bha/Desktop/lluFolder/masterProgram/01_26_19
+python2 01_26_19_subprocess.py
+
+pylon
+using pip
+install qt4
+opencv
+matplotlib
+plotly etc
+
+this program runs in base environment
+install all packages for this using pip, if cant, use apt-get
+dont use anaconda for this, as installing anaconda breaks pyqt in root environment
+
+
+
+
+clotting analysis - using fastai
+called "analysis script"
+create seperate environment using python3
+pip install fastai
+pip install natsort
+in /home/bha/Desktop/lluFolder/masterProgram/01_26_19
+python analysis_script.py
+PIL
+matplotlib
+natsort
+
+
+
+
+
+platelet analysis - old(using tensorflow)
+pip install tensorflow
+/home/llu-2/Desktop/lluFolder/tensorflow/models/research/object_detection/object_detection_image.py
+
+
+
+
+
+
