@@ -1,5 +1,0 @@
-install ubuntu 16.04
-
-get wifi driver from storage stick r8152_2.12.0
-sudo apt-get update
-sudo apt-get install linux-generic
