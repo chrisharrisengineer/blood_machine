@@ -4,3 +4,17 @@ plug into usb slot, boot into bios, install from there
 
 install wifi
 dont call me lenny install the realtek rtl8812
+
+sudo apt-get install linux-headers-$(uname -r) build-essential git
+
+git clone https://github.com/scrivy/rtl8812AU_8...
+
+cd rtl8812AU_8821AU_linux
+
+make
+
+sudo make install
+
+sudo modprobe rtl8812au
+
+reboot
