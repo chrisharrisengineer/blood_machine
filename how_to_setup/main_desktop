@@ -18,3 +18,19 @@ sudo make install
 sudo modprobe rtl8812au
 
 reboot
+
+
+NVIDIA DRIVER
+go to nvidia website and find driver, downloads
+
+sudo vim /etc/modprobe.d/blacklist.conf
+
+blacklist vga16fb
+blacklist nouveau
+blacklist rivafb
+blacklist nvidiafb
+blacklist rivatv
+
+sudo service lightdm stop
+
+sudo /etc/init.d/gdm stop
