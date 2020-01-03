@@ -1,0 +1,45 @@
+how to train for platelet detection
+desktop/tensorflow/models/research/object_detection
+
+label images using hastyai
+stick
+platelet
+
+get json file from hastyai
+convert this to CSV with annotations and images in the CSV(use an online json to csv tool)
+test.csv
+train.csv
+
+
+create tf_record
+put in object_detection/data
+test.record
+train.record
+
+
+make object detection/training
+pipeline.config
+platelet_object.pbtxt
+
+https://github.com/chrisharrisengineer/blood_machine/new/master/tf_object_detection
+ 
+config file
+ 
+feature extractor is faster_rcnn_resnet101  - object_detection/training
+ 
+run model_main.py with flagss, command
+python model_main.py 
+ 
+ 
+ observe with tensorboard
+ 
+ export inference graph with object_detection/export_inference_graph.py
+ 
+ inference script is object_detection_image.py
+ 
+ 
+ 
+ 
+ 
+ 
+ 
