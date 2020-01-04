@@ -17,19 +17,24 @@ test.record
 train.record
 
 
-make object detection/training
-pipeline.config
-platelet_object.pbtxt
+make object detection/training dir
+pipeline.config  - config file
+platelet_object.pbtxt - class file
 
-https://github.com/chrisharrisengineer/blood_machine/new/master/tf_object_detection
  
 config file
  
 feature extractor is faster_rcnn_resnet101  - object_detection/training
  
-run model_main.py with flagss, command
-python model_main.py 
  
+run object_detection/model_main.py with flags, command
+python model_main.py 
+model_dir= 
+pipeline_config_path= training/
+num_training_steps= 
+eval_training_data=
+checkpoint_dir=
+
  
  observe with tensorboard
  
