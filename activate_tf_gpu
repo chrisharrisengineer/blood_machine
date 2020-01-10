@@ -1,0 +1,10 @@
+#!/bin/bash
+
+eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
+conda activate tf_gpu
+
+which python
+
+cd /home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection
+
+python3 /home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection/object_detection_image.py

@@ -1,4 +1,4 @@
-#!/user/bin/env python
+#!/usr/bin/env python
 '''
 	File name: .py
 	Author: Chris Harris and Harrison Huang
@@ -14,7 +14,7 @@
 		export image
 '''
 
-#TODO switch the bit to flip the "programming running" bit off, added subprocesses for parallel clotting and platelet analysis
+#TODO switch the bit to flip the "programming running" bit off
 
 import sys
 import cv2
@@ -31,6 +31,8 @@ import pandas
 import random
 import glob
 import subprocess
+
+
 
 
 #from fastai.vision import *
@@ -323,8 +325,8 @@ class MyApp(QMainWindow):
 		plt.legend(loc='lower right')
 		plt.savefig('graph.png')
 		pixmap = QPixmap('graph.png')
-   		self.labGraph.setPixmap(pixmap)
-   		self.labGraph.show()
+		self.labGraph.setPixmap(pixmap)
+		self.labGraph.show()
 		print("MSG	graph plotted")
 
 #------------------------------------------------------------------------------------------------
@@ -443,10 +445,10 @@ class MyApp(QMainWindow):
 		
 	def showKeyboard(self, _, label, text, title):
 		keyboard = VirtualKeyboard(label, text, title)
-    		keyboard.show()
+		keyboard.show()
 
 #------------------------------------------------------------------------------------------------
-	
+
 
 #poll
 #---------------------------------------------------------------------------------------
@@ -644,10 +646,9 @@ class MyApp(QMainWindow):
 		rightMenuBar = QMenuBar()
 
 		closeAction = QAction("&Close", self)
-        	closeAction.triggered.connect(sys.exit)
+		closeAction.triggered.connect(sys.exit)
 		rightMenuBar.addAction(closeAction)
-		
-    		menuBar.setCornerWidget(rightMenuBar, Qt.TopRightCorner)
+		menuBar.setCornerWidget(rightMenuBar, Qt.TopRightCorner)
 	
 #---------------------------------------------------------------------------------------
 
@@ -686,6 +687,7 @@ class MyApp(QMainWindow):
 		self.btnTimer1Stop.released.connect(lambda : self.plc.send(2311, 0, type="rbit"))
 		self.btnTimer2Stop.pressed.connect(lambda : self.plc.send(2311, 1, type="rbit"))
 		self.btnTimer2Stop.released.connect(lambda : self.plc.send(2311, 0, type="rbit"))
+
 
 		self.timerArr = [self.timer1, self.timer2]
 	
@@ -921,27 +923,36 @@ class MyApp(QMainWindow):
 		carriageIsHomed = self.plc.read(2309, type="rbit")
 		drawerInMotion = self.plc.read(2374, type="rbit")
 
-		if not drawerOpen and not Message("Requesting to move Drawer", "Are you sure?").run():
-			return 
-		if carriageIsHomed and not drawerInMotion: 
-			if drawerOpen:
-				if STATUSBAR_ENABLED:
-					self.statusBar.showMessage("Closing Drawer...",2000)
-				self.plc.send(2371, 0, type="rbit") #was 1042, changed to 2371/R203, trying to figure out.
-				self.btnLoad.setText("Unload")
-			else:
-				if STATUSBAR_ENABLED:
-					self.statusBar.showMessage("Opening Drawer...",2000)
-				self.plc.send(2371, 1, type="rbit")
-				self.btnLoad.setText("Load")
+		#momentary, added this when changing "load drawer button" to "start test" button, made it a momentary bc new machine has no drawer
+		self.btnMoment.pressed.connect(lambda: self.plc.send(2371, 1, "rbit"))
+		self.btnLoad.pressed.connect(lambda: self.plc.send(2371, 1, "rbit"))
+		self.btnLoad.released.connect(lambda: self.plc.sendMulti([2371,2371], [0,0], "rbit"))
+
+		#add buzzer for run test button
+		self.btnLoad.pressed.connect(lambda : self.plc.send(2311, 1, type="rbit"))
+		self.btnLoad.released.connect(lambda : self.plc.send(2311, 0, type="rbit"))
+
+		#if not drawerOpen and not Message("Requesting to move Drawer", "Are you sure?").run():
+		#	return 
+#		if carriageIsHomed and not drawerInMotion: 
+#			if drawerOpen:
+#				if STATUSBAR_ENABLED:
+#					self.statusBar.showMessage("Closing Drawer...",2000)
+#				self.plc.send(2371, 0, type="rbit") #was 1042, changed to 2371/R203, trying to figure out.
+#				self.btnLoad.setText("Unload")
+#			else:
+#				if STATUSBAR_ENABLED:
+#					self.statusBar.showMessage("Opening Drawer...",2000)
+#				self.plc.send(2371, 1, type="rbit")
+#				self.btnLoad.setText("Load")
 			
 				
-		else:
-			print("MSG\tDrawer not ready, one or more motors are moving")
-			print("drawerInMotion: " + str(drawerInMotion))
-			print("carriageIsHomed" + str(carriageIsHomed))
-			if STATUSBAR_ENABLED:
-				self.statusBar.showMessage("Drawer is currently in motion, Wait.",1000)
+#		else:
+#			print("MSG\tDrawer not ready, one or more motors are moving")
+#			print("drawerInMotion: " + str(drawerInMotion))
+#			print("carriageIsHomed" + str(carriageIsHomed))
+#			if STATUSBAR_ENABLED:
+#				self.statusBar.showMessage("Drawer is currently in motion, Wait.",1000)
 
 #---------------------------------------------------------------------------------------
              
@@ -949,6 +960,7 @@ class MyApp(QMainWindow):
 #Logger	
 #---------------------------------------------------------------------------------------
 
+	
 	def loggerSetup(self):
 		self.btnTimerLog1.clicked.connect(lambda _: self.logTime(_, 0))
 		self.btnTimerLog2.clicked.connect(lambda _: self.logTime(_, 1))
@@ -990,9 +1002,9 @@ class MyApp(QMainWindow):
 			self.logEntryCounter[index] += 1			
 
 	def logReset(self):
-        	if not Message("Are you sure", "Reset timer results?").run():
+		if not Message("Are you sure", "Reset timer results?").run():
 			return
-        	for i in range(len(self.logManTimerArr)):
+		for i in range(len(self.logManTimerArr)):
 			self.logEntryCounter[i] = 0
 			self.pictureLog[i] = []
 			for j in range(len(self.logManTimerArr[i])):
@@ -1011,6 +1023,11 @@ class MyApp(QMainWindow):
 		self.logAutoTimerArr[index][self.logAutoEntryCounter[index]].setText(self.timerArr[index].getTime())
 		self.pictureLogAuto[index].append((self.camera.getCurrImgNumber(),self.timerArr[index].getTime()))
 		self.logAutoEntryCounter[index] += 1	
+
+
+	# logAutoTimerArr needs to be updated when clot endpoint found, set third location equal to clotting_endpoint_time
+	def logClot(self, string):
+			self.logAutoTimerArr[0][2].setText(string)
 
 #---------------------------------------------------------------------------------------
 
@@ -1086,10 +1103,10 @@ class MyApp(QMainWindow):
 			Qt.SmoothTransformation)
 
 		#take exact pixels (x,y,width,height) from image and scaled to fit panel size (currently 231x611)
-		self.pixmapDict["M1"] = self.pixmapOG.copy(950,280,240,960).scaled(160, 641, Qt.KeepAspectRatio)
-		self.pixmapDict["T1"] = self.pixmapOG.copy(640,80,345,1380).scaled(160, 641, Qt.KeepAspectRatio)
-		self.pixmapDict["T2"] = self.pixmapOG.copy(180,80,345,1380).scaled(160, 641, Qt.KeepAspectRatio).transformed(QTransform().scale(-1, 1))
-		self.pixmapDict["M2"] = self.pixmapOG.copy(0,280,240,960).scaled(160, 641, Qt.KeepAspectRatio).transformed(QTransform().scale(-1, 1))
+		self.pixmapDict["M1"] = self.pixmapOG.copy(820,80,345,1380).scaled(160, 641, Qt.KeepAspectRatio)
+		self.pixmapDict["T1"] = self.pixmapOG.copy(820,80,345,1380).scaled(160, 641, Qt.KeepAspectRatio)
+		self.pixmapDict["T2"] = self.pixmapOG.copy(0,80,345,1800).scaled(160, 641, Qt.KeepAspectRatio).transformed(QTransform().scale(-1, 1))
+		self.pixmapDict["M2"] = self.pixmapOG.copy(0,80,345,1780).scaled(160, 641, Qt.KeepAspectRatio).transformed(QTransform().scale(-1, 1))
 
 		#put pixmap into dict based on imageSelection and mirror
 		for displayDict in self.displayArr:
@@ -1317,15 +1334,15 @@ class PandasModel(QAbstractTableModel):
 #used by log reset confirm
 class Message():
 	def __init__(self, title, message):
-    		self.inputDialog = QMessageBox(None)
-    		self.inputDialog.setWindowTitle(title)
-    		self.inputDialog.setText(message)
-    		self.inputDialog.setFont(FONT)
+		self.inputDialog = QMessageBox(None)
+		self.inputDialog.setWindowTitle(title)
+		self.inputDialog.setText(message)
+		self.inputDialog.setFont(FONT)
 		self.inputDialog.addButton(QMessageBox.No)
 		self.inputDialog.addButton(QMessageBox.Yes)
 
 	def run(self):
-    		if self.inputDialog.exec_() == 16384: #mapped to yes
+		if self.inputDialog.exec_() == 16384: #mapped to yes
 			return True
 		return False
 
@@ -1338,13 +1355,13 @@ class Message():
 #used for combobox deletion (labtech and config)
 class ComboBoxDialog():
 	def __init__(self, title, items):
-    		self.inputDialog = QInputDialog(None)
-    		self.inputDialog.setWindowTitle(title)
-    		self.inputDialog.setFont(FONT)
+		self.inputDialog = QInputDialog(None)
+		self.inputDialog.setWindowTitle(title)
+		self.inputDialog.setFont(FONT)
 		self.inputDialog.setComboBoxItems(items)
 	def run(self):
 		confirm = self.inputDialog.exec_()
-    		out = self.inputDialog.textValue()
+		out = self.inputDialog.textValue()
 		return (confirm, out)
 
 #------------------------------------------------------------------------------------------------
@@ -1359,7 +1376,7 @@ class InputDialogKeyboard(QWidget):
 	def __init__(self, title):
 		super(InputDialogKeyboard, self).__init__()
 		loadUi('dialog.ui',self)
-    		self.setFont(FONT)
+		self.setFont(FONT)
 		self.setWindowTitle(title)
 		self.buttonBox.buttons()[0].clicked.connect(self.accepted)
 		self.buttonBox.buttons()[1].clicked.connect(self.rejected)
@@ -1481,20 +1498,20 @@ class Camera(QThread):
 		#main camera grab
 		while True:
 			if self.instant_camera.NumReadyBuffers:
-			    res = self.instant_camera.RetrieveResult(200)
-			    if res:
-				try:
-				    if res.GrabSucceeded():
-				        self.imgObject = cv2.cvtColor(res.Array, cv2.COLOR_BAYER_RG2RGB)
-				#	self.imgObject2 = cv2.cvtColor(res.Array, cv2.COLOR_BAYER_RG2GRAY)
-					self.imageSignal.emit(self.imgObject)
-					self.isThereNewImg = True
-					self.isThereNewVidImg = True
-					self.isThereNewAnalysisImg = True
-					self.isThereNewAnalysisImg1 = True
+				res = self.instant_camera.RetrieveResult(500)
+				if res:
+					try:
+						if res.GrabSucceeded():
+							self.imgObject = cv2.cvtColor(res.Array, cv2.COLOR_BAYER_RG2RGB)
+							#self.imgObject2 = cv2.cvtColor(res.Array, cv2.COLOR_BAYER_RG2GRAY)
+							self.imageSignal.emit(self.imgObject)
+							self.isThereNewImg = True
+							self.isThereNewVidImg = True
+							self.isThereNewAnalysisImg = True
+							self.isThereNewAnalysisImg1 = True
 					
-				finally:
-				    res.Release()
+					finally:
+						res.Release()
 
 	#start thread
 	def startThread(self, _, index):
@@ -1555,7 +1572,7 @@ class Camera(QThread):
 		counter = 0
 		c = time.time()
 		while self.saveThreadExist:
-			if self.isThereNewImg:
+			if self.isThereNewImg:		
 				counter+=1
 				self.isThereNewImg = False
 				self.imgNumber += 1
@@ -1564,12 +1581,16 @@ class Camera(QThread):
 
 				
 				#crop images and write to pics
-				#top left corner
-				x1, y1 = 400, 700
+				#top left corner				
+				x1, y1 = 0, 100
+				#x1, y1 = 50, 300
+
 				#bottom right corner
-				x2, y2 = 3900, 1500
+				#x2, y2 = 4000,1000
+				x2, y2 = 4050, 1000
 				
-				
+				#820,80,345,1380
+
 				# cv2 BGR to RGB
 				#img = cv2.cvtColor(self.imgObject, cv2.COLOR_BGR2RGB)
 					
@@ -1578,10 +1599,13 @@ class Camera(QThread):
 				cropped_imgM1 = self.imgObject[y1:y2, x1:x2]
 #				imgM2 = self.img[x2:width, y2:height]
 
-				#write cropped frame to analysis folder				
-				cropName = 'analysis/cropped_pics/crop'+str(self.imgNumber)+'.jpg'
-				cv2.imwrite(cropName, cropped_imgM1) 
-				
+				#write cropped frame to analysis folder	
+				time_elapsed = time.time() - c	
+				time_elapsed = int(time_elapsed)	
+				cropName = 'analysis/cropped_pics/crop'+str(self.imgNumber)+"."+str(time_elapsed)+'.jpg'
+				#cv2.imwrite(cropName, cropped_imgM1) 
+							
+
 				# see if its cropped properly
 #				cv2.imshow("m1", imgM1)
 #				cv2.imshow("m2", imgM2)
@@ -1590,19 +1614,20 @@ class Camera(QThread):
 				
 				
 
-				#cv2.imwrite('pics/Vtest'+str(self.imgNumber)+'.tiff', self.imgObject)		
+				cv2.imwrite('pics/Vtest'+str(self.imgNumber)+'.tiff', self.imgObject)		
 				#print('MSG	saved {}'.format(imgName))
-				if counter == 10:
-					counter = 0
-					print(str(1.0/((time.time() - c)/10.0)))
-					c = time.time()
+				#if counter == 10:
+				#	counter = 0
+				#	print(str(1.0/((time.time() - c)/10.0)))
+				#	c = time.time()
 				#self.isThereNewAnalysisImg = True
 				
 				
 
 	#main video making thread
 	def saveVidThread(self):
-		vidtest = cv2.VideoWriter(ROOT_DIR+'tests/{}_{}/{}_{}.avi'.format(MRN, DATETIME, MRN, DATETIME), cv2.VideoWriter_fourcc('X','V','I','D'), 10, (IMAGE_RESOLUTION['x'], IMAGE_RESOLUTION['y'])) #new addition, may need to remove
+		#vidtest = cv2.VideoWriter(ROOT_DIR+'a.avi'.format(MRN, DATETIME, MRN, DATETIME), cv2.cv.CV_FOURCC('X','V','I','D'), 10, (IMAGE_RESOLUTION['x'], IMAGE_RESOLUTION['y'])) #new addition, may need to remove		
+		vidtest = cv2.VideoWriter(ROOT_DIR+'tests/{}_{}/{}_{}.avi'.format(MRN, DATETIME, MRN, DATETIME), cv2.cv.CV_FOURCC('X','V','I','D'),  10, (IMAGE_RESOLUTION['x'], IMAGE_RESOLUTION['y'])) #new addition, may need to remove
 		while self.saveThreadExist:
 			if self.isThereNewVidImg:
 				self.isThereNewVidImg = False
@@ -1632,23 +1657,70 @@ class Camera(QThread):
 		stage = 0
 		found = False	
 		print("in analysis thread")
-		while self.saveThreadExist:
-			if self.isThereNewAnalysisImg:
-				self.isThereNewAnalysisImg = False
-		if self.saveThreadExist:	
-			subprocess.Popen(["/home/bha/fastai36/bin/python", "/home/bha/Desktop/lluFolder/masterProgram/01_26_19/analysis_script.py"]) 
-			#subprocess.Popen(["/home/llu-2/anaconda3/envs/tf_cpu/bin/python", "/home/llu-2/Desktop/lluFolder/tensorflow/models/research/object_detection/object_detection_image.py"]) 				
+		#while self.saveThreadExist:
+		#	if self.isThereNewAnalysisImg:
+		#		self.isThereNewAnalysisImg = False
+		if self.saveThreadExist:
+			#activate venv for clotting analysis and run script
+
+			#conda attempt for subprocess
+			subprocess.Popen(['/home/bha/Desktop/lluFolder/masterProgram/01_26_19/activate_tf_gpu'], shell=True)
+
+            #subprocess.Popen(["/home/bha/pip_tf_gpu/bin/python3.exe", "/home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection/object_detection_image.py"])
+			
+			clotting_subprocess = subprocess.Popen(["/home/bha/fastai36/bin/python3.6", "/home/bha/Desktop/lluFolder/masterProgram/01_26_19/analysis_script.py"], stdout=subprocess.PIPE, stderr = subprocess.STDOUT)
+
+            
+			#subprocess.Popen(["/home/bha/pip_tf_gpu/bin/python3.7", "/home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection/object_detection_image.py"])
+	
+			clotting_endpoint_time = (clotting_subprocess.communicate()[0])
+			#clotting endpoing time is the printed output of "analysis script" only works if this is only outputting the endpoint(printing only one thing)			
+			clotting_endpoint_time = str(clotting_endpoint_time)			
+			clotting_endpoint_digits_only = ''.join(filter(lambda i: i.isdigit(), clotting_endpoint_time))	
+			window.logClot(clotting_endpoint_digits_only)	
+			
+			#delete all contents of "clotting_pics"
+			#cropped_pics_to_delete = glob.glob('/home/bha/Desktop/lluFolder/masterProgram/01_26_19/analysis/cropped_pics')			
+			#for f in cropped_pics_to_delete:
+    			#    os.remove(f)
+
+			#dirPath = "/home/bha/Desktop/lluFolder/masterProgram/01_26_19/analysis/cropped_pics"
+			#fileList = os.listdir(dirPath)
+			#for fileName in fileList:
+ 			#    os.remove(dirPath+"/"+fileName)
 
 
+
+
+			#activate conda environment for platelet detection 
+			
+			#subprocess.Popen(["/home/bha/tf_gpu/bin/python3", "/home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection/object_detection_image.py"])	
+			#pip open tf_gpu		
+			
+			# just need to run three commands in new terminal:
+            #conda activate tf_gpu 
+            #cd /home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection
+            #python object_detection_image.py 					
+
+			
+			#open new terminal line
+			#this works			
+			#subprocess.Popen('gnome-terminal')
+
+			#gnome-terminal[-e, --command="conda activate tf_gpu; cd /home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection"; "python object_detection_image.py"]
+
+			#run whole code, doesnt work
+			#subprocess.Popen([gnome-terminal[-e, --command="conda activate tf_gpu; cd /home/bha/Desktop/lluFolder/tensorflow1/models/research/object_detection"], "python object_detection_image.py"])
+                        #delete cropped_pics contents
 
 
 	#report back to main class the img file name
-	def getCurrImgNumber(self):
-		return 'Vtest'+str(self.imgNumber)+'.jpg'
+	#def getCurrImgNumber(self):
+	#	return 'Vtest'+str(self.imgNumber)+'.jpg'
 
 #------------------------------------------------------------------------------------------------
 
-
+print("out of analysis thread")
 #Hardware
 #------------------------------------------------------------------------------------------------
 
@@ -1899,112 +1971,111 @@ class Polling(QThread):
 
 #TODO give creds
 class KeyButton(QPushButton):
-    sigKeyButtonClicked =  pyqtSignal()
+	sigKeyButtonClicked =  pyqtSignal()
 
-    def __init__(self, key):
+	def __init__(self, key):
 
-        super(KeyButton, self).__init__()
-    	self.setFont(FONT)
+		super(KeyButton, self).__init__()
+		self.setFont(FONT)
+		self._key = key
+		self._activeSize = QSize(60,60)
+		self.clicked.connect(self.emitKey)
+		self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
 
-        self._key = key
-        self._activeSize = QSize(60,60)
-        self.clicked.connect(self.emitKey)
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+	def emitKey(self):
+		self.sigKeyButtonClicked.emit()
 
-    def emitKey(self):
-        self.sigKeyButtonClicked.emit()
+	def enterEvent(self, event):
+		self.setFixedSize(self._activeSize)
 
-    def enterEvent(self, event):
-        self.setFixedSize(self._activeSize)
+	def leaveEvent(self, event):
+		self.setFixedSize(self.sizeHint())
 
-    def leaveEvent(self, event):
-        self.setFixedSize(self.sizeHint())
-
-    def sizeHint(self):
-        return QSize(55, 55)
+	def sizeHint(self):
+		return QSize(55, 55)
 
 class VirtualKeyboard(QWidget):
 
-    def __init__(self, lineEdit, text, title):
-        super(VirtualKeyboard, self).__init__()
-	self.setWindowFlags(Qt.WindowStaysOnTopHint)
-	self.setWindowTitle("Keyboard: " + title)
-        self.globalLayout = QVBoxLayout(self)
-        self.keysLayout = QGridLayout()
-        self.buttonLayout = QHBoxLayout()
+	def __init__(self, lineEdit, text, title):
+		super(VirtualKeyboard, self).__init__()
+		self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		self.setWindowTitle("Keyboard: " + title)
+		self.globalLayout = QVBoxLayout(self)
+		self.keysLayout = QGridLayout()
+		self.buttonLayout = QHBoxLayout()
 
-        self.keyListByLines = [
+		self.keyListByLines = [
 		    [('1','!'), ('2','@'), ('3','#'), ('4','$'), ('5','%'), ('6','*'), ('7','('), ('8',')'), ('9','_'), ('0','/')],
                     [('q','Q'), ('w','W'), ('e','E'), ('r','R'), ('t','T'), ('y','Y'), ('u','U'), ('i','I'), ('o','O'), ('p','P')],
                     [('a','A'), ('s','S'), ('d','D'), ('f','F'), ('g','G'), ('h','H'), ('j','J'), ('k','K'), ('l','L'), ('\'','"')],
                     [('z','Z'), ('x','X'), ('c','C'), ('v','V'), ('b','B'), ('n','N'), ('m','M'), (',','-'), ('.','+'), ('?','=')],
                 ]
 
-	self.inputLine = lineEdit
-        self.inputString = text
-	self.state = False
+		self.inputLine = lineEdit
+		self.inputString = text
+		self.state = False
 
-        self.stateButton = QPushButton()
-        self.stateButton.setText('Caps Lock')
-	self.stateButton.setFont(FONT)
-        self.backButton = QPushButton()
-        self.backButton.setText('BackSpace')
-	self.backButton.setFont(FONT)
-	self.spaceButton = QPushButton()
-        self.spaceButton.setText("Space")
-	self.spaceButton.setFont(FONT)
-        self.cancelButton = QPushButton()
-        self.cancelButton.setText("Close")
-	self.cancelButton.setFont(FONT)
+		self.stateButton = QPushButton()
+		self.stateButton.setText('Caps Lock')
+		self.stateButton.setFont(FONT)
+		self.backButton = QPushButton()
+		self.backButton.setText('BackSpace')
+		self.backButton.setFont(FONT)
+		self.spaceButton = QPushButton()
+		self.spaceButton.setText("Space")
+		self.spaceButton.setFont(FONT)
+		self.cancelButton = QPushButton()
+		self.cancelButton.setText("Close")
+		self.cancelButton.setFont(FONT)
 
-        for lineIndex, line in enumerate(self.keyListByLines):
-            for keyIndex, key in enumerate(line):
-                buttonName = "keyButton" + str(key)
-                self.__setattr__(buttonName, KeyButton(key))
-                self.keysLayout.addWidget(self.getButtonByKey(key), self.keyListByLines.index(line), line.index(key))
-                self.getButtonByKey(key).setText(key[self.state])
-		self.getButtonByKey(key).sigKeyButtonClicked.connect(lambda v=key: self.addInputByKey(v))
-                self.keysLayout.setColumnMinimumWidth(keyIndex, 60)
-            self.keysLayout.setRowMinimumHeight(lineIndex, 60)
+		for lineIndex, line in enumerate(self.keyListByLines):
+			for keyIndex, key in enumerate(line):
+				buttonName = "keyButton" + str(key)
+				self.__setattr__(buttonName, KeyButton(key))
+				self.keysLayout.addWidget(self.getButtonByKey(key), self.keyListByLines.index(line), line.index(key))
+				self.getButtonByKey(key).setText(key[self.state])
+				self.getButtonByKey(key).sigKeyButtonClicked.connect(lambda v=key: self.addInputByKey(v))
+				self.keysLayout.setColumnMinimumWidth(keyIndex, 60)
+			self.keysLayout.setRowMinimumHeight(lineIndex, 60)
 
-        self.stateButton.clicked.connect(self.switchState)
-	self.spaceButton.clicked.connect(self.space)
-        self.backButton.clicked.connect(self.backspace)
-        self.cancelButton.clicked.connect(self.close)
+		self.stateButton.clicked.connect(self.switchState)
+		self.spaceButton.clicked.connect(self.space)
+		self.backButton.clicked.connect(self.backspace)
+		self.cancelButton.clicked.connect(self.close)
 
-	self.buttonLayout.addWidget(self.stateButton)
-        self.buttonLayout.addWidget(self.backButton)
-	self.buttonLayout.addWidget(self.spaceButton)
-	self.buttonLayout.addWidget(self.cancelButton)
+		self.buttonLayout.addWidget(self.stateButton)
+		self.buttonLayout.addWidget(self.backButton)
+		self.buttonLayout.addWidget(self.spaceButton)
+		self.buttonLayout.addWidget(self.cancelButton)
         
-        self.globalLayout.addLayout(self.keysLayout)
-        self.globalLayout.addLayout(self.buttonLayout)
-        self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
+		self.globalLayout.addLayout(self.keysLayout)
+		self.globalLayout.addLayout(self.buttonLayout)
+		self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed))
 
-    def getButtonByKey(self, key):
-        return getattr(self, "keyButton" + str(key))
+	def getButtonByKey(self, key):
+		return getattr(self, "keyButton" + str(key))
 
-    def switchState(self):
-	self.state = not self.state
-	for line in self.keyListByLines:
-            	for key in line:
-		        self.getButtonByKey(key).setText(key[self.state])
+	def switchState(self):
+		self.state = not self.state
+		for line in self.keyListByLines:
+			for key in line:
+				self.getButtonByKey(key).setText(key[self.state])
 	
-    def addInputByKey(self, key):
-        self.inputString += key[self.state]
-        self.inputLine.setText(self.inputString)
+	def addInputByKey(self, key):
+		self.inputString += key[self.state]
+		self.inputLine.setText(self.inputString)
 
-    def backspace(self):
-        self.inputLine.backspace()
-        self.inputString = self.inputString[:-1]
+	def backspace(self):
+		self.inputLine.backspace()
+		self.inputString = self.inputString[:-1]
 
-    def space(self):
-	self.inputString += " "
-	self.inputLine.setText(self.inputString)
+	def space(self):
+		self.inputString += " "
+		self.inputLine.setText(self.inputString)
 
-    def sizeHint(self):
+	def sizeHint(self):
         #return QSize(480,272)
-	return QSize(500,300)
+		return QSize(500,300)
 
 #------------------------------------------------------------------------------------------------
 
@@ -2015,15 +2086,15 @@ class VirtualKeyboard(QWidget):
 
 #TODO give cred
 class FileDialog(QFileDialog):
-    def __init__(self, *args):
-        QFileDialog.__init__(self, *args)
-        self.setOption(self.DontUseNativeDialog, True)
-        self.setFileMode(self.DirectoryOnly)
+	def __init__(self, *args):
+		QFileDialog.__init__(self, *args)
+		self.setOption(self.DontUseNativeDialog, True)
+		self.setFileMode(self.DirectoryOnly)
 
-        for view in self.findChildren((QListView, QTreeView)):
-            if isinstance(view.model(), QFileSystemModel):
-                view.setSelectionMode(QAbstractItemView.ExtendedSelection)
-		view.setDragEnabled(False)
+		for view in self.findChildren((QListView, QTreeView)):
+			if isinstance(view.model(), QFileSystemModel):
+				view.setSelectionMode(QAbstractItemView.ExtendedSelection)
+				view.setDragEnabled(False)
 
 #------------------------------------------------------------------------------------------------
 
@@ -2044,6 +2115,7 @@ def displayToSecs(s):
 def tenthsToDisplay(i):
 	return "{}:{:02d}.{}".format(i / 600, (i / 10) % 60, i % 10)
 """
+clotting_endpoint_time = 0
 
 def displayToTenths(s):
 	sArr = str(s).split('.')
@@ -2086,6 +2158,6 @@ def testLookUp(mrn, date, time):
 if __name__ == "__main__":
 	app = QApplication(sys.argv)
 	window = MyApp()
-	window.show()
+	window.showMaximized()
 	sys.exit(app.exec_())
 	
