@@ -39,6 +39,8 @@ python model_main.py --model_dir=faster_rcnn_resnet101_lowproposals_coco_2018_01
  
  
  export inference graph with object_detection/export_inference_graph.py
+ python export_inference_graph.py --input_type image_tensor --pipeline_config_path training_soluble_fibrin/pipeline.config --trained_checkpoint_prefix faster_rcnn_resnet101_lowproposals_coco_2018_01_28/model.ckpt-17887 --output_directory inference_graph_soluble_fibrin_2_20
+ 
  
  inference script is object_detection_image.py
  
