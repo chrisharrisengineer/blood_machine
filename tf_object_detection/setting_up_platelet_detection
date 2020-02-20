@@ -28,15 +28,15 @@ feature extractor is faster_rcnn_resnet101  - object_detection/training
  
  
 run object_detection/model_main.py with flags, command
-python model_main.py 
-model_dir= 
-pipeline_config_path= training/
-num_training_steps= 
-eval_training_data=
-checkpoint_dir=
+python model_main.py --model_dir=faster_rcnn_resnet101_lowproposals_coco_2018_01_28/ 
+--pipeline_config_path=training_soluble_fibrin/pipeline.config --num_training_steps=999999 
+--eval_training_data=True --sample_1_of_n_eval_on_train_examples=1 -- checkpoint_dir=checkpoint_soluble_fibrin/ 
+--alsologstoderr
+
 
  
  observe with tensorboard
+ 
  
  export inference graph with object_detection/export_inference_graph.py
  
