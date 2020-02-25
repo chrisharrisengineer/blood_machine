@@ -21,6 +21,7 @@ make object detection/training dir
 pipeline.config  - config file
 platelet_object.pbtxt - class file
 
+delete all checkpoint events from faster_rcnn_resnet_coco folder, delete
  
 config file
  
