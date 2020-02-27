@@ -15,6 +15,7 @@ create tf_record
 put in object_detection/data
 test.record
 train.record
+python generate_tfrecord.py --csv_input=soluble_fibrin_Feb_27/test_labels.csv --image_dir=images/test --output_path=data_soluble_Feb_27/test.record
 
 
 make object detection/training dir
